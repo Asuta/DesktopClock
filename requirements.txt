@@ -1,4 +1,10 @@
 # 项目依赖包
 customtkinter==5.2.2  # 美化版的tkinter界面库
 pillow==10.2.0       # 图像处理库
+pystray==0.19.5      # 系统托盘支持库
+six==1.17.0          # pystray的依赖包
+
+# 开发环境建议
+# Python >= 3.7
+
 # 在这里添加您的项目所需的包 
