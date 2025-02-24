@@ -96,9 +96,9 @@ class TimerApp(ctk.CTk):
         self.after_id = None
         self.is_visible = True
         
-        # 添加拖动功能
-        self.time_label.bind("<B1-Motion>", self.drag_window)
-        self.time_label.bind("<Button-1>", self.get_pos)
+        # 绑定拖动事件到整个窗口
+        self.bind("<B1-Motion>", self.drag_window)
+        self.bind("<Button-1>", self.get_pos)
         
         # 添加鼠标悬停事件
         self.bind("<Enter>", self.show_buttons)
