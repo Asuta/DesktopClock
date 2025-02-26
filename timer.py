@@ -20,10 +20,15 @@ class TimerApp(ctk.CTk):
         ctk.set_appearance_mode("dark")  # 可以改为 "light" 或 "dark"
         ctk.set_default_color_theme("blue")  # 可以改为 "blue", "green", "dark-blue"
         
+        # 定义不同状态的颜色
+        self.color_idle = "#2C6E49"      # 深绿色 - 未计时状态
+        self.color_running = "#5c5c5c"    # 深灰色 - 计时中状态 
+        self.color_paused = "#E76F51"     # 橙色 - 暂停状态
+        
         # 创建主框架 - 设置背景颜色
         self.main_frame = ctk.CTkFrame(
             self,
-            fg_color="#5c5c5c",  # 深灰色背景
+            fg_color=self.color_idle,  # 初始使用未计时状态颜色
             bg_color="transparent"
         )
         self.main_frame.pack(expand=True, fill="both")
@@ -95,10 +100,12 @@ class TimerApp(ctk.CTk):
         self.elapsed_time = timedelta()
         self.after_id = None
         self.is_visible = True
+        self.is_dragging = False  # 添加拖动状态标志
         
         # 绑定拖动事件到整个窗口
         self.bind("<B1-Motion>", self.drag_window)
         self.bind("<Button-1>", self.get_pos)
+        self.bind("<ButtonRelease-1>", self.end_drag)  # 添加松开鼠标按钮的事件
         
         # 添加鼠标悬停事件
         self.bind("<Enter>", self.show_buttons)
@@ -170,6 +177,10 @@ class TimerApp(ctk.CTk):
         self.geometry("120x65")  # 扩大窗口以显示按钮
 
     def hide_buttons(self, event):
+        # 如果正在拖动，不执行任何操作
+        if self.is_dragging:
+            return
+            
         # 检查鼠标是否真的离开了窗口区域
         mouse_x = self.winfo_pointerx() - self.winfo_rootx()
         mouse_y = self.winfo_pointery() - self.winfo_rooty()
@@ -180,13 +191,29 @@ class TimerApp(ctk.CTk):
     def get_pos(self, event):
         self.x = event.x
         self.y = event.y
+        self.button_frame.pack(fill="x", padx=5, pady=2)
+        self.geometry("120x65")  # 鼠标按下时，立即显示完整状态
 
     def drag_window(self, event):
+        self.is_dragging = True  # 设置拖动状态标志
         deltax = event.x - self.x
         deltay = event.y - self.y
         x = self.winfo_x() + deltax
         y = self.winfo_y() + deltay
         self.geometry(f"+{x}+{y}")
+        self.geometry("120x65")  # 确保窗口大小保持完整显示状态
+        
+    def end_drag(self, event):
+        self.is_dragging = False  # 清除拖动状态标志
+
+    def update_frame_color(self):
+        """根据当前计时状态更新底板颜色"""
+        if self.is_running:
+            self.main_frame.configure(fg_color=self.color_running)
+        elif self.is_paused:
+            self.main_frame.configure(fg_color=self.color_paused)
+        else:
+            self.main_frame.configure(fg_color=self.color_idle)
 
     def toggle_timer(self):
         if not self.is_running:
@@ -200,6 +227,7 @@ class TimerApp(ctk.CTk):
             self.is_running = True
             self.is_paused = False
             self.toggle_button.configure(text="暂停")
+            self.update_frame_color()  # 更新底板颜色
             self.update_timer()
         else:
             # 暂停计时
@@ -209,6 +237,7 @@ class TimerApp(ctk.CTk):
             if self.after_id:
                 self.after_cancel(self.after_id)
             self.elapsed_time = datetime.now() - self.start_time
+            self.update_frame_color()  # 更新底板颜色
 
     def stop_timer(self):
         # 停止计时
@@ -219,6 +248,7 @@ class TimerApp(ctk.CTk):
             self.after_cancel(self.after_id)
         self.elapsed_time = timedelta()
         self.time_label.configure(text="00:00:00")
+        self.update_frame_color()  # 更新底板颜色
 
     def update_timer(self):
         if self.is_running:
