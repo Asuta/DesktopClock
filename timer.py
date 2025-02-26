@@ -67,8 +67,8 @@ class TimerApp(ctk.CTk):
         # 创建停止按钮
         self.stop_button = ctk.CTkButton(
             self.button_frame,
-            text="停止",
-            command=self.stop_timer,
+            text="再来",
+            command=self.restart_timer,
             width=35,
             height=20,
             font=("Arial", 12),
@@ -131,7 +131,7 @@ class TimerApp(ctk.CTk):
         menu = (
             pystray.MenuItem('显示/隐藏', self.toggle_window),
             pystray.MenuItem('开始/暂停', self.toggle_timer),
-            pystray.MenuItem('停止', self.stop_timer),
+            pystray.MenuItem('再来', self.restart_timer),
             pystray.MenuItem('退出', self.quit_app)
         )
         
@@ -249,6 +249,18 @@ class TimerApp(ctk.CTk):
         self.elapsed_time = timedelta()
         self.time_label.configure(text="00:00:00")
         self.update_frame_color()  # 更新底板颜色
+
+    def restart_timer(self):
+        # 停止当前计时并立即开始新的计时
+        self.stop_timer()  # 先停止当前计时
+        # 立即开始新的计时
+        self.start_time = datetime.now()
+        self.elapsed_time = timedelta()
+        self.is_running = True
+        self.is_paused = False
+        self.toggle_button.configure(text="暂停")
+        self.update_frame_color()  # 更新底板颜色
+        self.update_timer()
 
     def update_timer(self):
         if self.is_running:
