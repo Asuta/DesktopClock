@@ -119,9 +119,9 @@ class TimerApp(ctk.CTk):
         self.setup_system_tray()
         
         # 设置全局快捷键
-        keyboard.add_hotkey('alt+1', self.toggle_timer)
-        keyboard.add_hotkey('alt+2', self.restart_timer)
-        keyboard.add_hotkey('alt+3', self.stop_timer)  # 添加 Alt+3 快捷键
+        keyboard.add_hotkey('alt+8', self.toggle_timer)
+        keyboard.add_hotkey('alt+9', self.restart_timer)
+        keyboard.add_hotkey('alt+0', self.stop_timer)  # 添加 Alt+3 快捷键
         
         # 绑定窗口关闭事件
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
