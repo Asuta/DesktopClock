@@ -3,6 +3,7 @@ customtkinter==5.2.2  # 美化版的tkinter界面库
 pillow==10.2.0       # 图像处理库
 pystray==0.19.5      # 系统托盘支持库
 six==1.17.0          # pystray的依赖包
+keyboard==0.13.5     # 全局快捷键支持库
 
 # 开发环境建议
 # Python >= 3.7

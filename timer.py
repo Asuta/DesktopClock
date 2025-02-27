@@ -5,6 +5,7 @@ import pystray
 from PIL import Image, ImageDraw
 import threading
 import os
+import keyboard  # 添加keyboard库
 
 class TimerApp(ctk.CTk):
     def __init__(self):
@@ -116,6 +117,11 @@ class TimerApp(ctk.CTk):
 
         # 创建系统托盘
         self.setup_system_tray()
+        
+        # 设置全局快捷键
+        keyboard.add_hotkey('alt+1', self.toggle_timer)
+        keyboard.add_hotkey('alt+2', self.restart_timer)
+        keyboard.add_hotkey('alt+3', self.stop_timer)  # 添加 Alt+3 快捷键
         
         # 绑定窗口关闭事件
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
