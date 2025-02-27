@@ -5,7 +5,7 @@ import pystray
 from PIL import Image, ImageDraw
 import threading
 import os
-import keyboard  # 添加keyboard库
+from pynput import keyboard
 
 class TimerApp(ctk.CTk):
     def __init__(self):
@@ -278,10 +278,33 @@ class TimerApp(ctk.CTk):
 
     def setup_hotkeys(self):
         """在独立线程中设置热键"""
-        keyboard.add_hotkey('alt+8', self.toggle_timer)
-        keyboard.add_hotkey('alt+9', self.restart_timer)
-        keyboard.add_hotkey('alt+0', self.stop_timer)
-        keyboard.wait()  # 保持热键监听
+        def on_press(key):
+            try:
+                # 检查组合键
+                if key == keyboard.Key.alt_l or key == keyboard.Key.alt_r:
+                    self.alt_pressed = True
+                elif self.alt_pressed and hasattr(key, 'char'):
+                    if key.char == '8':
+                        self.after(0, self.toggle_timer)
+                    elif key.char == '9':
+                        self.after(0, self.restart_timer)
+                    elif key.char == '0':
+                        self.after(0, self.stop_timer)
+            except AttributeError:
+                pass
+
+        def on_release(key):
+            if key == keyboard.Key.alt_l or key == keyboard.Key.alt_r:
+                self.alt_pressed = False
+
+        # 初始化 alt 键状态
+        self.alt_pressed = False
+        
+        # 启动监听
+        listener = keyboard.Listener(
+            on_press=on_press,
+            on_release=on_release)
+        listener.start()
 
 if __name__ == "__main__":
     app = TimerApp()
