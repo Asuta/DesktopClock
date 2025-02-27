@@ -119,34 +119,12 @@ class TimerApp(ctk.CTk):
         self.setup_system_tray()
         
         # 设置全局快捷键
-        self.setup_hotkeys()
-        
-        # 设置定时重新注册快捷键（每5分钟）
-        self.after(300000, self.refresh_hotkeys)
+        self.keyboard_thread = threading.Thread(target=self.setup_hotkeys)
+        self.keyboard_thread.daemon = True  # 设置为守护线程
+        self.keyboard_thread.start()
         
         # 绑定窗口关闭事件
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
-
-    def setup_hotkeys(self):
-        """设置全局快捷键"""
-        # 先尝试移除已有的快捷键（如果存在）
-        try:
-            keyboard.remove_hotkey('alt+8')
-            keyboard.remove_hotkey('alt+9')
-            keyboard.remove_hotkey('alt+0')
-        except:
-            pass
-        
-        # 重新注册快捷键
-        keyboard.add_hotkey('alt+8', self.toggle_timer)
-        keyboard.add_hotkey('alt+9', self.restart_timer)
-        keyboard.add_hotkey('alt+0', self.stop_timer)
-
-    def refresh_hotkeys(self):
-        """定时刷新快捷键注册"""
-        self.setup_hotkeys()
-        # 再次设置5分钟后刷新
-        self.after(300000, self.refresh_hotkeys)
 
     def create_tray_icon(self):
         # 创建一个简单的图标
@@ -297,6 +275,13 @@ class TimerApp(ctk.CTk):
             display_time = timedelta(seconds=int(self.elapsed_time.total_seconds()))
             self.time_label.configure(text=str(display_time))
             self.after_id = self.after(1000, self.update_timer)
+
+    def setup_hotkeys(self):
+        """在独立线程中设置热键"""
+        keyboard.add_hotkey('alt+8', self.toggle_timer)
+        keyboard.add_hotkey('alt+9', self.restart_timer)
+        keyboard.add_hotkey('alt+0', self.stop_timer)
+        keyboard.wait()  # 保持热键监听
 
 if __name__ == "__main__":
     app = TimerApp()
