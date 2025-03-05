@@ -284,11 +284,11 @@ class TimerApp(ctk.CTk):
                 if key == keyboard.Key.alt_l or key == keyboard.Key.alt_r:
                     self.alt_pressed = True
                 elif self.alt_pressed and hasattr(key, 'char'):
-                    if key.char == '8':
+                    if key.char == '9':
                         self.after(0, self.toggle_timer)
                     elif key.char == '0':
                         self.after(0, self.restart_timer)
-                    elif key.char == '9':
+                    elif key.char == '8':
                         self.after(0, self.stop_timer)
                     elif key.char == '-':  # 检查是否按下 '-' 键
                         self.after(0, self.toggle_window)  # 切换窗口显示和隐藏
